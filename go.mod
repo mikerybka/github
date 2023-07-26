@@ -1,3 +1,3 @@
 module github.com/mikerybka/github
 
-go 1.21rc2
+go 1.20
