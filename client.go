@@ -9,12 +9,14 @@ import (
 )
 
 type Client struct {
-	Token string
+	UserID string
+	Token  string
 }
 
 func NewClient(userID, token string) *Client {
 	return &Client{
-		Token: token,
+		UserID: userID,
+		Token:  token,
 	}
 }
 
@@ -40,7 +42,7 @@ func (c *Client) GetUser() (*User, error) {
 
 func (c *Client) CreateRepo(org, name, description string, public bool) error {
 	url := "https://api.github.com/user/repos"
-	if org != "" {
+	if org != c.UserID {
 		url = "https://api.github.com/orgs/" + org + "/repos"
 	}
 	b, err := json.Marshal(CreateRepoRequest{
@@ -51,12 +53,13 @@ func (c *Client) CreateRepo(org, name, description string, public bool) error {
 	if err != nil {
 		panic(err)
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(b))
 	if err != nil {
 		panic(err)
 	}
 	req.Header.Set("Authorization", "token "+c.Token)
 	req.Header.Set("Content-Type", "application/vnd.github+json")
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
