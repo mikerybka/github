@@ -32,8 +32,13 @@ func (c *Client) GetUser() (*User, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(string(b))
 	user := &User{}
-	err = json.NewDecoder(resp.Body).Decode(user)
+	err = json.Unmarshal(b, user)
 	if err != nil {
 		return nil, err
 	}
