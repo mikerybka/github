@@ -23,24 +23,24 @@ func NewClient(userID, token string) *Client {
 func (c *Client) GetUser() (*User, error) {
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating request: %s", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+c.Token)
 	req.Header.Set("Accept", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("sending request: %s", err)
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("reading response: %s", err)
 	}
 	fmt.Println(string(b))
 	user := &User{}
 	err = json.Unmarshal(b, user)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unmarshaling response: %s", err)
 	}
 	return user, nil
 }
